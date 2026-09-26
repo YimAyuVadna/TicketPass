@@ -1,7 +1,13 @@
 """
-Phase 2 - Train the Model
-Trains a Decision Tree classifier to predict DIGITAL (0) vs PHYSICAL (1)
-ticket preference, evaluates it, and saves it as ticket_classifier.pkl
+TicketPass — Machine Learning Implementation
+
+# Point 3: ML #1 — Decision Tree Ticket Type Classifier
+# Point 3.1: Purpose
+The purpose of ML #1 is to predict the ticket type:
+  - DIGITAL (0)
+  - PHYSICAL (1)
+The model learns patterns from previous ticket/order data and uses those
+patterns to classify new ticket/order transactions.
 """
 
 import os
@@ -15,9 +21,20 @@ from sklearn.metrics import (
     confusion_matrix,
 )
 
-DATA_PATH = os.path.join("data", "training_data.csv")
-MODEL_PATH = "ticket_classifier.pkl"
-LABEL_MAP = {0: "DIGITAL", 1: "PHYSICAL"}
+# Resolve paths relative to script location
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = os.path.join(BASE_DIR, "data", "training_data.csv")
+MODEL_PATH = os.path.join(BASE_DIR, "ticket_classifier.pkl")
+
+# Point 3.1 & Point 5: Binary Classification Task
+# Classification means predicting a discrete category/class rather than a continuous number (e.g. not $15.72).
+# Because there are exactly two target classes, this is a Binary Classification problem:
+#   - Class 0: DIGITAL
+#   - Class 1: PHYSICAL
+LABEL_MAP = {
+    0: "DIGITAL",
+    1: "PHYSICAL"
+}
 
 
 def load_data(path: str) -> pd.DataFrame:
@@ -28,6 +45,9 @@ def load_data(path: str) -> pd.DataFrame:
 
 
 def train_and_evaluate(df: pd.DataFrame):
+    # Point 4: Supervised Learning — Separate Features (X) and Ground-Truth Labels (y)
+    # Supervised learning means the training data contains the correct answers ('label').
+    # The Decision Tree learns to map: Features (X) -> Ticket Type Label (y).
     feature_cols = [c for c in df.columns if c != "label"]
     X = df[feature_cols]
     y = df["label"]
@@ -36,6 +56,7 @@ def train_and_evaluate(df: pd.DataFrame):
         X, y, test_size=0.2, random_state=42, stratify=y
     )
 
+    # Point 3: Initialize the Decision Tree Classifier
     model = DecisionTreeClassifier(
         max_depth=6,
         min_samples_leaf=5,
